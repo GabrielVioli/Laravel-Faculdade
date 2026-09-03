@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+
+class ProductController extends Controller
+{
+    public function index(): JsonResponse
+    {
+        return response()->json(Product::with('category')->get());
+    }
+
+    public function store(StoreProductRequest $request): JsonResponse
+    {
+        $product = Product::create($request->validated());
+
+        return response()->json($product->load('category'), Response::HTTP_CREATED);
+    }
+
+    public function show(Product $product): JsonResponse
+    {
+        return response()->json($product->load('category'));
+    }
+
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
+    {
+        $product->update($request->validated());
+
+        return response()->json($product->fresh()->load('category'));
+    }
+
+    public function destroy(Product $product): Response
+    {
+        $product->delete();
+
+        return response()->noContent();
+    }
+}
