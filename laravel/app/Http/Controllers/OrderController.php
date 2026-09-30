@@ -18,8 +18,7 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $data = $this->calculateTotals($data);
+        $data = $this->calculateTotals($request->validated());
 
         $order = Order::create($data);
 
@@ -40,9 +39,8 @@ class OrderController extends Controller
             $order->only(['customer_id', 'product_id', 'quantity', 'status']),
             $request->validated(),
         );
-        $data = $this->calculateTotals($data);
 
-        $order->update($data);
+        $order->update($this->calculateTotals($data));
 
         return response()->json($order->fresh()->load(['customer', 'product']));
     }
